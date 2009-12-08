@@ -1,0 +1,6 @@
+0.03 
+	-adding the command line args. ( -url , -c , -n , -debug , -file, -proxy , useragent ) 
+0.02
+	-add some stats output + small code refactoring
+0.01
+	-first public release
