@@ -1,35 +1,45 @@
 #!/usr/bin/env perl
 #Yet another http benchmark ;)
-use common::sense; 
-use AnyEvent::HTTP;
-use Time::HiRes;
-use Getopt::Long; 
-use DateTime;
-use Data::Dumper;
+use common::sense; #new features
+use AnyEvent::HTTP; # main module
+use Time::HiRes; # to measure time
+use Getopt::Long; # to command line parsing
+use DateTime; # to make time human-readable :)
+use Data::Dumper; # to see the date in debug
 my $DEBUG = 0; #Debug mode. Default is false (0)
-my $timeout = 60;
+my $timeout = 60; 
 my $count = 30000; #number of requests
 my $concurency = 20; # number of parralle requests
 my $done = 0; 
-my $url = 'http://elementa.su/';# url to test
+my $url = 'http://elementa.su/';# default url to test
 my $method = 'GET'; #http method
+my $proxy; # proxy server
+my $file; #scenario file
+my $max_recurse = 10; # the default recurse number;
+my $useragent = 'Mozilla/5.0 (compatible; U; AnyEvent::HTTPBenchmark/0.03; +http://github.com/shafiev/AnyEvent-HTTPBenchmark)';
 
-my $cv = AnyEvent->condvar;
 #arrays
 my @reqs_time; # the times of requests
 my @scenario;  #used for  script scenario file . Not yet implemented (: 
 
+parse_command_line(); #parsing the command line arguments
+#read_script_file(); #read the url script file
+
 $AnyEvent::VERBOSE = 10 if $DEBUG;
 $AnyEvent::HTTP::MAX_PER_HOST = $concurency;
+$AnyEvent::HTTP::set_proxy = $proxy;
+$AnyEvent::HTTP::set_proxy = $max_recurse;
+$AnyEvent::HTTP::USERAGENT = $useragent; 
 
 #on ctrl-c break run the end_bench sub.
 $SIG{'INT'} = 'end_bench';
 
+my $cv = AnyEvent->condvar; 
+
+#start measuring time
 my $start_time = Time::HiRes::time;
 my $dt = DateTime->from_epoch( epoch => $start_time  );
 say 'Started at ' .($dt->hms). '.' .($dt->millisecond);
-
-#read_script_file(); #read the url script file
 
 #starting requests
 for ( 1 .. $concurency ) 
@@ -41,6 +51,18 @@ $cv->recv; # begin receiving message and make callbacks magic ;)
 end_bench(); # call the end
 
 #subs 
+sub parse_command_line
+{
+    #get options which ovveride the default values
+    my $result = GetOptions ("url=s" => \$url,
+                             "n=i"   => \$count,
+                             "c=i"   => \$concurency,
+                             "debug" => \$DEBUG,
+                             "file=s" => \$file,
+                             "proxy=s" => \$proxy,
+                             "useragent=s" => \$useragent );    
+}
+
 sub add_request 
 {
     my ($id, $url) = @_;
@@ -75,9 +97,7 @@ sub add_request
 #sub read_script_file under test
 sub read_script_file
 {
-    my $file = $ARGV[0];
-
-    warn "invalid file "
+    die "invalid file "
     unless -e $file and -s _ and -f _;
 
 
@@ -100,7 +120,6 @@ sub read_script_file
   close FH;
 
 }
-
 
 sub end_bench
 {
