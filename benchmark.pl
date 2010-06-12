@@ -6,6 +6,7 @@ use Getopt::Long; # to command line parsing
 use POSIX;
 use Data::Dumper; # to see the date in debug
 my $DEBUG = 0; #Debug mode. Default is false (0)
+my $verbose = 0; #to view the each connection result 
 my $timeout = 60; 
 my $count = 30000; #number of requests
 my $concurency = 20; # number of parralle requests
@@ -15,7 +16,7 @@ my $method = 'GET'; #http method
 my $proxy; # proxy server
 my $file; #scenario file
 my $max_recurse = 10; # the default recurse number;
-my $useragent = 'Mozilla/5.0 (compatible; U; AnyEvent::HTTPBenchmark/0.03; +http://github.com/shafiev/AnyEvent-HTTPBenchmark)';
+my $useragent = 'Mozilla/5.0 (compatible; U; AnyEvent::HTTPBenchmark/0.05; +http://github.com/shafiev/AnyEvent-HTTPBenchmark)';
 
 #arrays
 my @reqs_time; # the times of requests
@@ -33,7 +34,8 @@ $SIG{'INT'} = 'end_bench';
 my $cv = AnyEvent->condvar; 
 
 #start measuring time
-my $start_time = Time::HiRes::time;
+my $start_time = AnyEvent->time;
+
 
 print 'Started at ' .format_time( $start_time ) . "\n";
 
@@ -53,6 +55,7 @@ sub parse_command_line
     my $result = GetOptions ("url=s" => \$url,
                              "n=i"   => \$count,
                              "c=i"   => \$concurency,
+                             "verbose!" => \$verbose,
                              "debug" => \$DEBUG,
                              "proxy=s" => \$proxy,
                              "useragent=s" => \$useragent );    
@@ -62,12 +65,12 @@ sub add_request
 {
     my ($id, $url) = @_;
 
-    my $req_time = Time::HiRes::time;
+    my $req_time = AnyEvent->time;
     http_request $method => $url, timeout => $timeout, sub 
     {
-        my $completed = Time::HiRes::time;
+        my $completed = AnyEvent->time;
 	my $req_time = format_seconds( $completed - $req_time );
-        print "Got answer in $req_time seconds\n";
+        print "Got answer in $req_time seconds\n" if $verbose;
         push @reqs_time , $req_time;
         $done++;
         
@@ -75,11 +78,11 @@ sub add_request
        
         if ( $hdr->{Status} =~ /^2/ )
         {
-            print "done $done\n";
+            print "done $done\n" if $verbose;
         }
         else
         {
-            print "Oops we get problem in  request  . $done  . ($hdr->{Status}) . ($hdr->{Reason}) \n";
+            print STDERR "Oops we get problem in  request  . $done  . ($hdr->{Status}) . ($hdr->{Reason}) \n";
         }    
           
         return add_request($done, $url) if $done < $count;
@@ -91,7 +94,7 @@ sub add_request
 
 sub end_bench
 {
-    my $end_time = Time::HiRes::time;
+    my $end_time = AnyEvent->time;
     my $overall_time = format_seconds( $end_time - $start_time );
     print "It takes the $overall_time seconds\n";
     my $sum;
