@@ -3,7 +3,7 @@ use common::sense; #new features in perl(not for 5.8.8 and older (; )
 use AnyEvent::HTTP; # main module
 use Time::HiRes; # to measure time
 use Getopt::Long; # to command line parsing
-use DateTime; # to make time human-readable :)
+use POSIX;
 use Data::Dumper; # to see the date in debug
 my $DEBUG = 0; #Debug mode. Default is false (0)
 my $timeout = 60; 
@@ -34,8 +34,8 @@ my $cv = AnyEvent->condvar;
 
 #start measuring time
 my $start_time = Time::HiRes::time;
-my $dt = DateTime->from_epoch( epoch => $start_time  );
-print 'Started at ' .($dt->hms). '.' .($dt->millisecond);
+
+print 'Started at ' .format_time( $start_time ) . "\n";
 
 #starting requests
 for ( 1 .. $concurency ) 
@@ -66,9 +66,9 @@ sub add_request
     http_request $method => $url, timeout => $timeout, sub 
     {
         my $completed = Time::HiRes::time;
-        my $dtin = DateTime->from_epoch( epoch => ($completed-$req_time)  );
-        print 'Got answer in '. $dtin->second . '.' . $dtin->millisecond .' seconds' . "\n";
-        push( @reqs_time , ( ($dtin->second) .'.'. ($dtin->millisecond) ) );
+	my $req_time = format_seconds( $completed - $req_time );
+        print "Got answer in $req_time seconds\n";
+        push @reqs_time , $req_time;
         $done++;
         
         my $hdr = @_[1];
@@ -92,19 +92,12 @@ sub add_request
 sub end_bench
 {
     my $end_time = Time::HiRes::time;
-    my $end_dt = DateTime->from_epoch( epoch => ($end_time - $start_time) );
-    print 'It\'s takes the  ' . ($end_dt->second) .'.' .($end_dt->millisecond) ." seconds .\n";
+    my $overall_time = format_seconds( $end_time - $start_time );
+    print "It takes the $overall_time seconds\n";
     my $sum;
     
-    #dirty hack to avoid division by zero ;)
-    if ( ($end_dt->second) ==0 )
-    { 
-        print 'Requests per second  is ' . ( $count /($end_dt->millisecond) ) . "\n"; 
-    }
-    else
-    {   
-        print 'Requests per second  is ' . ( $count /( ($end_dt->minute)*60 + ($end_dt->second) )) . "\n";
-    }       
+    print 'Requests per second: '.sprintf( "%.2f", $count / $overall_time )."\n";
+
     #sort by time
     @reqs_time = sort (@reqs_time);
     
@@ -115,9 +108,21 @@ sub end_bench
     }
     
     print "\nShortest is :  $reqs_time[0]  sec. \n";
-    print "Average time is : ". ($sum/$count) . " sec. \n";
+    print "Average time is : ". format_seconds($sum/$count) . " sec. \n";
     print "Longest is :  $reqs_time[scalar(@reqs_time)-1] sec. \n";
     exit;
+}
+
+sub format_time {
+    my ($microsec, $seconds) = modf( shift );
+
+    my ($sec, $min, $hour) = localtime( $seconds );
+
+    return sprintf "%02d:%02d:%02d.%04d", $hour, $min, $sec, int( $microsec * 10000 );
+}
+
+sub format_seconds {
+    return sprintf "%.4f", shift;
 }
 
 1;
