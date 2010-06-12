@@ -27,6 +27,28 @@ $AnyEvent::HTTP::MAX_PER_HOST = $concurency;
 $AnyEvent::HTTP::set_proxy    = $proxy;
 $AnyEvent::HTTP::USERAGENT    = $useragent;
 
+# Caching results of AnyEvent::DNS::a
+my $orig_anyeventdnsa = \&AnyEvent::DNS::a;
+my %cache;
+*AnyEvent::DNS::a = sub($$) {
+    my ($domain, $cb) = @_;
+
+    if ($cache{$domain}) {
+	$cb->( @{ $cache{$domain} } );
+	return;
+    }
+
+    $orig_anyeventdnsa->( $domain,
+	sub {
+	    $cache{$domain} = [ @_ ];
+	    $cb->( @_ );
+	}
+    );
+
+    return;
+};
+# End of caching
+
 #on ctrl-c break run the end_bench sub.
 $SIG{'INT'} = 'end_bench';
 
@@ -75,11 +97,15 @@ HEREDOC
         "url=s"       => \$url,
         "n=i"         => \$count,
         "c=i"         => \$concurency,
-        "verbose!"    => \$verbose,
+        "verbose|v+"  => \$verbose,
         "debug"       => \$DEBUG,
         "proxy=s"     => \$proxy,
         "useragent=s" => \$useragent
     );
+
+    if ($concurency > $count) {
+        $concurency = $count;
+    }
 
     unless ($url) {
         if (@ARGV) {
@@ -104,6 +130,11 @@ sub add_request {
         print "Got answer in $req_time seconds\n" if $verbose;
         push @reqs_time, $req_time;
         $done++;
+
+	if ($verbose >= 2) {
+	    print "=========== HTTP RESPONCE ===========\n";
+	    print @_[0];
+	}
 
         my $hdr = @_[1];
 
