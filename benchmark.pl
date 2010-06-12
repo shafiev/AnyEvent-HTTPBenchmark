@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
-#Yet another http benchmark ;)
-use common::sense; #new features
+use common::sense; #new features in perl(not for 5.8.8 and older (; )
 use AnyEvent::HTTP; # main module
 use Time::HiRes; # to measure time
 use Getopt::Long; # to command line parsing
@@ -20,15 +19,12 @@ my $useragent = 'Mozilla/5.0 (compatible; U; AnyEvent::HTTPBenchmark/0.03; +http
 
 #arrays
 my @reqs_time; # the times of requests
-my @scenario;  #used for  script scenario file . Not yet implemented (: 
 
 parse_command_line(); #parsing the command line arguments
-#read_script_file(); #read the url script file
 
 $AnyEvent::VERBOSE = 10 if $DEBUG;
 $AnyEvent::HTTP::MAX_PER_HOST = $concurency;
 $AnyEvent::HTTP::set_proxy = $proxy;
-$AnyEvent::HTTP::set_proxy = $max_recurse;
 $AnyEvent::HTTP::USERAGENT = $useragent; 
 
 #on ctrl-c break run the end_bench sub.
@@ -39,7 +35,7 @@ my $cv = AnyEvent->condvar;
 #start measuring time
 my $start_time = Time::HiRes::time;
 my $dt = DateTime->from_epoch( epoch => $start_time  );
-say 'Started at ' .($dt->hms). '.' .($dt->millisecond);
+print 'Started at ' .($dt->hms). '.' .($dt->millisecond);
 
 #starting requests
 for ( 1 .. $concurency ) 
@@ -58,7 +54,6 @@ sub parse_command_line
                              "n=i"   => \$count,
                              "c=i"   => \$concurency,
                              "debug" => \$DEBUG,
-                             "file=s" => \$file,
                              "proxy=s" => \$proxy,
                              "useragent=s" => \$useragent );    
 }
@@ -72,7 +67,7 @@ sub add_request
     {
         my $completed = Time::HiRes::time;
         my $dtin = DateTime->from_epoch( epoch => ($completed-$req_time)  );
-        say 'Got answer in '. $dtin->second . '.' . $dtin->millisecond .' seconds';
+        print 'Got answer in '. $dtin->second . '.' . $dtin->millisecond .' seconds' . "\n";
         push( @reqs_time , ( ($dtin->second) .'.'. ($dtin->millisecond) ) );
         $done++;
         
@@ -80,11 +75,11 @@ sub add_request
        
         if ( $hdr->{Status} =~ /^2/ )
         {
-            say "done $done\n";
+            print "done $done\n";
         }
         else
         {
-            say "Oops we get problem in  request  . $done  . ($hdr->{Status}) . ($hdr->{Reason}) ";
+            print "Oops we get problem in  request  . $done  . ($hdr->{Status}) . ($hdr->{Reason}) \n";
         }    
           
         return add_request($done, $url) if $done < $count;
@@ -94,49 +89,21 @@ sub add_request
 }
 
 
-#sub read_script_file under test
-sub read_script_file
-{
-    die "invalid file "
-    unless -e $file and -s _ and -f _;
-
-
-    open FH, '<', $file;
-    while ( <FH> ) 
-    {
-        chomp;
-        my ($method, $url) = split( / /, $_, 2 );
-
-        if ( $method !~ /get|post/io ) 
-        {
-            warn "bad method [$method]\n";
-            next;
-        }
-
-
-        push( @scenario, [ $method, $url ] );
-    }
-
-  close FH;
-
-}
-
 sub end_bench
 {
     my $end_time = Time::HiRes::time;
     my $end_dt = DateTime->from_epoch( epoch => ($end_time - $start_time) );
-    say;
-    say 'It\'s takes the '  . ($end_dt->second) .'.' .($end_dt->millisecond) .' seconds';
+    print 'It\'s takes the  ' . ($end_dt->second) .'.' .($end_dt->millisecond) ." seconds .\n";
     my $sum;
     
     #dirty hack to avoid division by zero ;)
     if ( ($end_dt->second) ==0 )
     { 
-        say 'Requests per second  is ' . ( $count /($end_dt->millisecond) ); 
+        print 'Requests per second  is ' . ( $count /($end_dt->millisecond) ) . "\n"; 
     }
     else
     {   
-        say 'Requests per second  is ' . ( $count /( ($end_dt->minute)*60 + ($end_dt->second) ));
+        print 'Requests per second  is ' . ( $count /( ($end_dt->minute)*60 + ($end_dt->second) )) . "\n";
     }       
     #sort by time
     @reqs_time = sort (@reqs_time);
@@ -146,10 +113,10 @@ sub end_bench
         #calculate average time
         $sum +=$reqs_time[$i];
     }
-    say ;#new line
-    say 'Shortest is : '. $reqs_time[0] . ' sec.';
-    say 'Average time is : '. ($sum/$count) . ' sec.';
-    say 'Longest is : '. $reqs_time[scalar(@reqs_time)-1] . ' sec.';
+    
+    print "\nShortest is :  $reqs_time[0]  sec. \n";
+    print "Average time is : ". ($sum/$count) . " sec. \n";
+    print "Longest is :  $reqs_time[scalar(@reqs_time)-1] sec. \n";
     exit;
 }
 
