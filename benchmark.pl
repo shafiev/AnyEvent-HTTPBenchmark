@@ -53,7 +53,7 @@ sub parse_command_line {
         "url=s"       => \$url,
         "n=i"         => \$count,
         "c=i"         => \$concurency,
-        "verbose!"    => \$verbose,
+        "verbose|v+"  => \$verbose,
         "debug"       => \$DEBUG,
         "proxy=s"     => \$proxy,
         "useragent=s" => \$useragent
@@ -85,6 +85,11 @@ sub add_request {
         print "Got answer in $req_time seconds\n" if $verbose;
         push @reqs_time, $req_time;
         $done++;
+
+	if ($verbose >= 2) {
+	    print "=========== HTTP RESPONCE ===========\n";
+	    print @_[0];
+	}
 
         my $hdr = @_[1];
 
