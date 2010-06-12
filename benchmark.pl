@@ -38,6 +38,7 @@ my %cache;
 	return;
     }
 
+warn "asd";
     $orig_anyeventdnsa->( $domain,
 	sub {
 	    $cache{$domain} = [ @_ ];
@@ -72,24 +73,26 @@ sub parse_command_line {
     if (not defined @ARGV)
     {
         print <<HEREDOC;
+    AnyEvent::HTTPBenchmark     http://github.com/shafiev/AnyEvent-HTTPBenchmark
 
-        url    => \$url,
-        number       count,
-        c         => \$concurency,
-        "verbose!"    => \$verbose,
-        "debug"       => \$DEBUG,
-        "proxy=s"     => \$proxy,
-        "useragent=s" => \$useragent
+
+        -url                 url to test,
+        -number        number of requests,
+        -c                    number of parrallel clients
+        -verbose        verbose mode
+        -debug           debug mode
+        -proxy            proxy
+        -useragent     useragent string
 
 Example :
     ./benchmark.pl -url=http://myfavouritesite.com  -n=number_of_requests -c=number_of_parrallel clients 
-    -
+    
  Another example :
     ./benchmark.pl --url=http://example.com -n=100 -c=10 -v 
     
 
 HEREDOC
-       
+       exit;
     }
 
     #get options which ovveride the default values
