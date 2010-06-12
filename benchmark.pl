@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 use common::sense; #new features in perl(not for 5.8.8 and older (; )
 use AnyEvent::HTTP; # main module
-use Time::HiRes; # to measure time
 use Getopt::Long; # to command line parsing
 use POSIX;
 use Data::Dumper; # to see the date in debug
