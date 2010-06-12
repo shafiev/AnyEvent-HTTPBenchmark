@@ -4,23 +4,23 @@ use AnyEvent::HTTP;    # main module
 use Getopt::Long;      # to command line parsing
 use POSIX;
 use Data::Dumper;      # to see the date in debug
-my $DEBUG      = 0;                        #Debug mode. Default is false (0)
-my $verbose    = 0;                        #to view the each connection result
+my $DEBUG      = 0;        #Debug mode. Default is false (0)
+my $verbose    = 0;        #to view the each connection result
 my $timeout    = 60;
-my $count      = 30000;                    #number of requests
-my $concurency = 20;                       # number of parralle requests
+my $count      = 30000;    #number of requests
+my $concurency = 20;       # number of parralle requests
 my $done       = 0;
-my $url        = 'http://elementa.su/';    # default url to test
-my $method     = 'GET';                    #http method
-my $proxy;                                 # proxy server
-my $file;                                  #scenario file
-my $max_recurse = 10;                      # the default recurse number;
+my $url;                   # default url to test
+my $method = 'GET';        #http method
+my $proxy;                 # proxy server
+my $file;                  #scenario file
+my $max_recurse = 10;      # the default recurse number;
 my $useragent = 'Mozilla/5.0 (compatible; U; AnyEvent::HTTPBenchmark/0.05; +http://github.com/shafiev/AnyEvent-HTTPBenchmark)';
 
 #arrays
-my @reqs_time;                             # the times of requests
+my @reqs_time;             # the times of requests
 
-parse_command_line();                      #parsing the command line arguments
+parse_command_line();      #parsing the command line arguments
 
 $AnyEvent::VERBOSE            = 10 if $DEBUG;
 $AnyEvent::HTTP::MAX_PER_HOST = $concurency;
@@ -58,6 +58,15 @@ sub parse_command_line {
         "proxy=s"     => \$proxy,
         "useragent=s" => \$useragent
     );
+
+    unless ($url) {
+        if (@ARGV) {
+            $url = shift @ARGV;
+        }
+        else {
+            $url = 'http://elementa.su/';
+        }
+    }
 }
 
 sub add_request {
