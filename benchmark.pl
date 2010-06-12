@@ -59,6 +59,10 @@ sub parse_command_line {
         "useragent=s" => \$useragent
     );
 
+    if ($concurency > $count) {
+        $concurency = $count;
+    }
+
     unless ($url) {
         if (@ARGV) {
             $url = shift @ARGV;
