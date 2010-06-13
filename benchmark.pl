@@ -29,19 +29,30 @@ $AnyEvent::HTTP::USERAGENT    = $useragent;
 
 # Caching results of AnyEvent::DNS::a
 my $orig_anyeventdnsa = \&AnyEvent::DNS::a;
-my %cache;
+my %result_cache;
+my %callback_cache;
 *AnyEvent::DNS::a = sub($$) {
     my ($domain, $cb) = @_;
 
-    if ($cache{$domain}) {
-	$cb->( @{ $cache{$domain} } );
+    if ($result_cache{$domain}) {
+	$cb->( @{ $result_cache{$domain} } );
 	return;
     }
 
+    if ($callback_cache{$domain}) {
+	push @{ $callback_cache{$domain} }, $cb;
+	return;
+    }
+
+    $callback_cache{$domain} = [];
+
     $orig_anyeventdnsa->( $domain,
 	sub {
-	    $cache{$domain} = [ @_ ];
+	    $result_cache{$domain} = [ @_ ];
 	    $cb->( @_ );
+	    while ( my $cached_cb = shift @{ $callback_cache{$domain} } ) {
+		$cached_cb->( @_ );
+	    }
 	}
     );
 
