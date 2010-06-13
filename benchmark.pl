@@ -27,22 +27,35 @@ $AnyEvent::HTTP::MAX_PER_HOST = $concurency;
 $AnyEvent::HTTP::set_proxy    = $proxy;
 $AnyEvent::HTTP::USERAGENT    = $useragent;
 
+
+=for 1
 # Caching results of AnyEvent::DNS::a
 # really hack code.will rewrited in nearest future
 my $orig_anyeventdnsa = \&AnyEvent::DNS::a;
-my %cache;
+my %result_cache;
+my %callback_cache;
 *AnyEvent::DNS::a = sub($$) {
     my ($domain, $cb) = @_;
 
-    if ($cache{$domain}) {
-	$cb->( @{ $cache{$domain} } );
+    if ($result_cache{$domain}) {
+	$cb->( @{ $result_cache{$domain} } );
 	return;
     }
 
+    if ($callback_cache{$domain}) {
+	push @{ $callback_cache{$domain} }, $cb;
+	return;
+    }
+
+    $callback_cache{$domain} = [];
+
     $orig_anyeventdnsa->( $domain,
 	sub {
-	    $cache{$domain} = [ @_ ];
+	    $result_cache{$domain} = [ @_ ];
 	    $cb->( @_ );
+	    while ( my $cached_cb = shift @{ $callback_cache{$domain} } ) {
+		$cached_cb->( @_ );
+	    }
 	}
     );
 
@@ -50,6 +63,7 @@ my %cache;
 };
 # End of caching
 # End of MegaKostil'
+=cut
 
 #on ctrl-c break run the end_bench sub.
 $SIG{'INT'} = 'end_bench';
