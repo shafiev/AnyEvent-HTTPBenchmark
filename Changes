@@ -1,3 +1,6 @@
+0.05 
+	-adding help
+	-try to curve dns caching problem :)
 0.04
 	-remove the -file param releted code.
 	-change the all say to perl due the perl 5.8.x(really because this version is using be RHEL/CentOS )

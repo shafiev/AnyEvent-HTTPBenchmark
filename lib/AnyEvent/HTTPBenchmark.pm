@@ -5,15 +5,15 @@ use strict;
 
 =head1 NAME
 
-AnyEvent::HTTPBenchmark - The great new AnyEvent::HTTPBenchmark!
+AnyEvent::HTTPBenchmark - The tool to make benchmark good and easy!
 
 =head1 VERSION
 
-Version 0.01
+Version 0.05
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.05';
 
 
 =head1 SYNOPSIS
@@ -24,9 +24,7 @@ Perhaps a little code snippet.
 
     use AnyEvent::HTTPBenchmark;
 
-    my $foo = AnyEvent::HTTPBenchmark->new();
-    ...
-
+   
 =head1 EXPORT
 
 A list of functions that can be exported.  You can delete this section
@@ -46,6 +44,7 @@ sub function1 {
 =cut
 
 sub function2 {
+	#under construction
 }
 
 =head1 AUTHOR

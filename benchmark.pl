@@ -9,11 +9,11 @@ my $verbose    = 0;        #to view the each connection result
 my $timeout    = 60;
 my $count      = 30000;    #number of requests
 my $concurency = 20;       # number of parralle requests
-my $done       = 0;
+my $done       = 0;             #number of done requests
 my $url; 
 my $method = 'GET';        #http method
 my $proxy;                 # proxy server
-my $file;                  #scenario file
+my $file;                  #scenario file(for future use);
 my $max_recurse = 10;      # the default recurse number;
 my $useragent = 'Mozilla/5.0 (compatible; U; AnyEvent::HTTPBenchmark/0.05; +http://github.com/shafiev/AnyEvent-HTTPBenchmark)';
 
@@ -28,6 +28,7 @@ $AnyEvent::HTTP::set_proxy    = $proxy;
 $AnyEvent::HTTP::USERAGENT    = $useragent;
 
 # Caching results of AnyEvent::DNS::a
+# really hack code.will rewrited in nearest future
 my $orig_anyeventdnsa = \&AnyEvent::DNS::a;
 my %cache;
 *AnyEvent::DNS::a = sub($$) {
@@ -38,7 +39,6 @@ my %cache;
 	return;
     }
 
-warn "asd";
     $orig_anyeventdnsa->( $domain,
 	sub {
 	    $cache{$domain} = [ @_ ];
@@ -49,6 +49,7 @@ warn "asd";
     return;
 };
 # End of caching
+# End of MegaKostil'
 
 #on ctrl-c break run the end_bench sub.
 $SIG{'INT'} = 'end_bench';

@@ -16,4 +16,5 @@ WriteMakefile(
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'AnyEvent-HTTPBenchmark-*' },
+    EXE_FILES => ['benchmark.pl'] ,
 );
