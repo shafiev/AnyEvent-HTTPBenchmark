@@ -10,7 +10,7 @@ my $timeout    = 60;
 my $count      = 30000;    #number of requests
 my $concurency = 20;       # number of parralle requests
 my $done       = 0;
-my $url;                   # default url to test
+my $url; 
 my $method = 'GET';        #http method
 my $proxy;                 # proxy server
 my $file;                  #scenario file
@@ -80,6 +80,30 @@ end_bench();    # call the end
 
 #subs
 sub parse_command_line {
+    if (not defined @ARGV)
+    {
+        print <<HEREDOC;
+    AnyEvent::HTTPBenchmark     http://github.com/shafiev/AnyEvent-HTTPBenchmark
+
+
+        -url                 url to test,
+        -number        number of requests,
+        -c                    number of parrallel clients
+        -verbose        verbose mode
+        -debug           debug mode
+        -proxy            proxy
+        -useragent     useragent string
+
+Example :
+    ./benchmark.pl -url=http://myfavouritesite.com  -n=number_of_requests -c=number_of_parrallel clients 
+    
+ Another example :
+    ./benchmark.pl --url=http://example.com -n=100 -c=10 -v 
+    
+
+HEREDOC
+       exit;
+    }
 
     #get options which ovveride the default values
     my $result = GetOptions(
@@ -101,6 +125,7 @@ sub parse_command_line {
             $url = shift @ARGV;
         }
         else {
+            #set the default site elementa.su 
             $url = 'http://elementa.su/';
         }
     }
