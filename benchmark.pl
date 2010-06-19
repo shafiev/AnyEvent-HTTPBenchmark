@@ -1,21 +1,19 @@
 #!/usr/bin/env perl
-use common::sense;     #new features in perl(not for 5.8.8 and older (; )
-use AnyEvent::HTTP;    # main module
+use common::sense;     #new features in perl
 use Getopt::Long;      # to command line parsing
 use POSIX;
-use Data::Dumper;      # to see the date in debug
+use Data::Dumper;      # to debug data
 my $DEBUG      = 0;        #Debug mode. Default is false (0)
 my $verbose    = 0;        #to view the each connection result
 my $timeout    = 60;
 my $count      = 30000;    #number of requests
 my $concurency = 20;       # number of parralle requests
 my $done       = 0;             #number of done requests
-my $url; 
+my $url; # the url to test
 my $method = 'GET';        #http method
 my $proxy;                 # proxy server
-my $file;                  #scenario file(for future use);
 my $max_recurse = 10;      # the default recurse number;
-my $useragent = 'Mozilla/5.0 (compatible; U; AnyEvent::HTTPBenchmark/0.05; +http://github.com/shafiev/AnyEvent-HTTPBenchmark)';
+my $useragent = 'Mozilla/5.0 (compatible; U; AnyEvent::HTTPBenchmark/0.06; +http://github.com/shafiev/AnyEvent-HTTPBenchmark)';
 
 #arrays
 my @reqs_time;             # the times of requests
@@ -26,44 +24,6 @@ $AnyEvent::VERBOSE            = 10 if $DEBUG;
 $AnyEvent::HTTP::MAX_PER_HOST = $concurency;
 $AnyEvent::HTTP::set_proxy    = $proxy;
 $AnyEvent::HTTP::USERAGENT    = $useragent;
-
-
-=for 1
-# Caching results of AnyEvent::DNS::a
-# really hack code.will rewrited in nearest future
-my $orig_anyeventdnsa = \&AnyEvent::DNS::a;
-my %result_cache;
-my %callback_cache;
-*AnyEvent::DNS::a = sub($$) {
-    my ($domain, $cb) = @_;
-
-    if ($result_cache{$domain}) {
-	$cb->( @{ $result_cache{$domain} } );
-	return;
-    }
-
-    if ($callback_cache{$domain}) {
-	push @{ $callback_cache{$domain} }, $cb;
-	return;
-    }
-
-    $callback_cache{$domain} = [];
-
-    $orig_anyeventdnsa->( $domain,
-	sub {
-	    $result_cache{$domain} = [ @_ ];
-	    $cb->( @_ );
-	    while ( my $cached_cb = shift @{ $callback_cache{$domain} } ) {
-		$cached_cb->( @_ );
-	    }
-	}
-    );
-
-    return;
-};
-# End of caching
-# End of MegaKostil'
-=cut
 
 #on ctrl-c break run the end_bench sub.
 $SIG{'INT'} = 'end_bench';
@@ -100,10 +60,10 @@ sub parse_command_line {
         -useragent     useragent string
 
 Example :
-    ./benchmark.pl -url=http://myfavouritesite.com  -n=number_of_requests -c=number_of_parrallel clients 
+    ./benchmark.pl -url http://myfavouritesite.com  -n number_of_requests -c number_of_parrallel clients 
     
  Another example :
-    ./benchmark.pl --url=http://example.com -n=100 -c=10 -v 
+    benchmark.pl --url http://example.com -n 100 -c 10 -v 
     
 
 HEREDOC
@@ -122,6 +82,7 @@ HEREDOC
     );
 
     if ($concurency > $count) {
+        #the mini hack to prevoid stupid cases ;)
         $concurency = $count;
     }
 

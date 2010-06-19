@@ -9,26 +9,23 @@ AnyEvent::HTTPBenchmark - The tool to make benchmark good and easy!
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 
 =head1 SYNOPSIS
+The apache benchmark (ab) , siege, jmeter and etc, are sometimes awesome to make http-load testing. But if 
+you want make some non-traditional test they are not good decision.This module try to help you in this case.
+Currently implemented just test utility , not a library .
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
-    use AnyEvent::HTTPBenchmark;
-
+	benchmark.pl --url http://example.com -n 100 -c 10 -v 
    
 =head1 EXPORT
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+Currently no export functions are implemented.
 
 =head1 SUBROUTINES/METHODS
 
