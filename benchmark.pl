@@ -139,7 +139,7 @@ sub end_bench {
     print 'Requests per second: ' . sprintf( "%.2f", $count / $overall_time ) . "\n";
 
     #sort by time
-    @reqs_time = sort (@reqs_time);
+    @reqs_time = sort {$a <=> $b} (@reqs_time);
 
     for my $i ( 0 .. scalar(@reqs_time) ) {
 
