@@ -5,23 +5,25 @@ use strict;
 
 =head1 NAME
 
-AnyEvent::HTTPBenchmark - The tool to make benchmark good and easy!
+AnyEvent::HTTPBenchmark - The tool to make http benchmarking good and easy!
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 
 =head1 SYNOPSIS
+
 The apache benchmark (ab) , siege, jmeter and etc, are sometimes awesome to make http-load testing. But if 
 you want make some non-traditional test they are not good decision.This module try to help you in this case.
-Currently implemented just test utility , not a library .
+Currently implemented just test utility , not a library .Be patient ;)
 
-	benchmark.pl --url http://example.com -n 100 -c 10 -v 
+
+	benchmark.pl --url http://example.com -n 100 -c 10 -verbose 
    
 =head1 EXPORT
 
@@ -33,7 +35,8 @@ Currently no export functions are implemented.
 
 =cut
 
-sub function1 {
+sub make_request {
+	#not implemented
 }
 
 =head2 function2
@@ -55,8 +58,6 @@ the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=AnyEvent-H
 automatically be notified of progress on your bug as I make changes.
 
 
-
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
@@ -65,6 +66,9 @@ You can find documentation for this module with the perldoc command.
 
 
 You can also look for information at:
+
+L<http://github.com/shafiev/AnyEvent-HTTPBenchmark>
+
 
 =over 4
 

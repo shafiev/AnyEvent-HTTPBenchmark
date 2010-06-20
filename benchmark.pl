@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use common::sense;     #new features in perl
 use Getopt::Long;      # to command line parsing
+use AnyEvent::HTTP; # use for http requests and etc. methods
 use POSIX;
 use Data::Dumper;      # to debug data
 my $DEBUG      = 0;        #Debug mode. Default is false (0)
@@ -13,10 +14,10 @@ my $url; # the url to test
 my $method = 'GET';        #http method
 my $proxy;                 # proxy server
 my $max_recurse = 10;      # the default recurse number;
-my $useragent = 'Mozilla/5.0 (compatible; U; AnyEvent::HTTPBenchmark/0.06; +http://github.com/shafiev/AnyEvent-HTTPBenchmark)';
+my $useragent = 'Mozilla/5.0 (compatible; U; AnyEvent::HTTPBenchmark/0.07; +http://github.com/shafiev/AnyEvent-HTTPBenchmark)';
 
 #arrays
-my @reqs_time;             # the times of requests
+my @reqs_time;             # the time of requests
 
 parse_command_line();      #parsing the command line arguments
 
@@ -63,7 +64,7 @@ Example :
     ./benchmark.pl -url http://myfavouritesite.com  -n number_of_requests -c number_of_parrallel clients 
     
  Another example :
-    benchmark.pl --url http://example.com -n 100 -c 10 -v 
+    benchmark.pl --url http://example.com -n 100 -c 10 -verbose 3
     
 
 HEREDOC
@@ -75,7 +76,7 @@ HEREDOC
         "url=s"       => \$url,
         "n=i"         => \$count,
         "c=i"         => \$concurency,
-        "verbose|v+"  => \$verbose,
+        "verbose=i"  => \$verbose,
         "debug"       => \$DEBUG,
         "proxy=s"     => \$proxy,
         "useragent=s" => \$useragent
@@ -111,7 +112,7 @@ sub add_request {
         $done++;
 
 	if ($verbose >= 2) {
-	    print "=========== HTTP RESPONCE ===========\n";
+	    print "=========== HTTP RESPONSE ===========\n";
 	    print @_[0];
 	}
 

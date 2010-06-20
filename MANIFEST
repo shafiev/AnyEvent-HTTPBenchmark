@@ -2,6 +2,7 @@ Changes
 MANIFEST
 Makefile.PL
 README
+benchmark.pl
 lib/AnyEvent/HTTPBenchmark.pm
 t/00-load.t
 t/manifest.t
