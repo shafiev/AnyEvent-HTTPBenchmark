@@ -1,6 +1,6 @@
 AnyEvent-HTTPBenchmark
 
-AnyEvent-HTTPBenchmark is tool to make benchmark good and easy
+AnyEvent-HTTPBenchmark is tool and library to make benchmarking good and easy
 
 INSTALLATION
 
@@ -32,6 +32,7 @@ You can also look for information at:
     Search CPAN
         http://search.cpan.org/dist/AnyEvent-HTTPBenchmark/
 
+and also look at git repositary http://github.com/shafiev/AnyEvent-HTTPBenchmark
 
 LICENSE AND COPYRIGHT
 

@@ -14,7 +14,7 @@ my $url; # the url to test
 my $method = 'GET';        #http method
 my $proxy;                 # proxy server
 my $max_recurse = 10;      # the default recurse number;
-my $useragent = 'Mozilla/5.0 (compatible; U; AnyEvent::HTTPBenchmark/0.07; +http://github.com/shafiev/AnyEvent-HTTPBenchmark)';
+my $useragent = 'Mozilla/5.0 (compatible; U; AnyEvent::HTTPBenchmark/0.08; +http://github.com/shafiev/AnyEvent-HTTPBenchmark)';
 
 #arrays
 my @reqs_time;             # the time of requests
@@ -83,7 +83,7 @@ HEREDOC
     );
 
     if ($concurency > $count) {
-        #the mini hack to prevoid stupid cases ;)
+        #the mini hack to avoid stupid cases ;)
         $concurency = $count;
     }
 

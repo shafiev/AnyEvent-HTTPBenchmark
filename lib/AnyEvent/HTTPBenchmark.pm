@@ -5,15 +5,15 @@ use strict;
 
 =head1 NAME
 
-AnyEvent::HTTPBenchmark - The tool to make http benchmarking good and easy!
+AnyEvent::HTTPBenchmark - The tool and library to make http benchmarking good and easy!
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 
 =head1 SYNOPSIS
@@ -23,7 +23,12 @@ you want make some non-traditional test they are not good decision.This module t
 Currently implemented just test utility , not a library .Be patient ;)
 
 
-	benchmark.pl --url http://example.com -n 100 -c 10 -verbose 
+	benchmark.pl --url http://example.com -n 100 -c 10 -verbose 1
+	#show each connection
+	benchmark.pl --url http://example.com -n 100 -c 10 
+	#makes the silent test
+	benchmark.pl --url http://example.com -n 100 -c 10 -verbose 2
+	#more details - show the responce
    
 =head1 EXPORT
 
@@ -31,8 +36,8 @@ Currently no export functions are implemented.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 function1
-
+=head2 make_request
+not implemented
 =cut
 
 sub make_request {
