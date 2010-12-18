@@ -7,8 +7,8 @@ use Data::Dumper;      # to debug data
 my $DEBUG      = 0;        #Debug mode. Default is false (0)
 my $verbose    = 0;        #to view the each connection result
 my $timeout    = 60;
-my $count      = 30000;    #number of requests
-my $concurency = 20;       # number of parralle requests
+my $count      = 30000;    #default number of requests
+my $concurency = 20;       # default number of parralle requests
 my $done       = 0;             #number of done requests
 my $url; # the url to test
 my $method = 'GET';        #http method
