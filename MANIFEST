@@ -2,6 +2,7 @@ Changes
 MANIFEST
 Makefile.PL
 README
+LICENSE
 benchmark.pl
 lib/AnyEvent/HTTPBenchmark.pm
 t/00-load.t
