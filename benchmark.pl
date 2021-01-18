@@ -47,7 +47,7 @@ end_bench();    # call the end
 
 #subs
 sub parse_command_line {
-    if (not defined @ARGV)
+    if (!@ARGV)
     {
         print <<HEREDOC;
     AnyEvent::HTTPBenchmark     http://github.com/shafiev/AnyEvent-HTTPBenchmark
